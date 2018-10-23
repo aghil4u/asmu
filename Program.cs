@@ -26,8 +26,8 @@ namespace asmu
         //      public static String REPORT = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ASSET MASTER UPDATE.xlsx");
         public static List<Equipment> EquipmentMaster = new List<Equipment>();
         public static List<Equipment> AssetMaster = new List<Equipment>();
-        public static List<Equipment> EquipmentMasterOnServer = new List<Equipment>();
-        public static List<Equipment> Equipments_tobe_updated_to_Server = new List<Equipment>();
+        public static List<ServerEquipment> EquipmentsOnServer = new List<ServerEquipment>();
+        public static List<ServerEquipment> Equipments_tobe_updated_to_Server = new List<ServerEquipment>();
 
         private static GuiSession session;
 
@@ -117,12 +117,12 @@ namespace asmu
                 {
                     Console.Write("\rChecking " + i + " of " + AssetMaster.Count + " items. " + changes + " Updates Found");
                     Equipment equipment = AssetMaster[i];
-                    Equipment e_onServer = EquipmentMasterOnServer.Where((e) => e.EquipmentNumber == equipment.EquipmentNumber).First();
+                    ServerEquipment e_onServer = EquipmentsOnServer.Where((e) => e.EquipmentNumber== equipment.EquipmentNumber).First();
                     if (e_onServer != null)
                     {
-                        if (e_onServer.New.EquipmentDescription != equipment.New.EquipmentDescription)
+                        if (e_onServer.EquipmentDescription != equipment.New.EquipmentDescription)
                         {
-                            e_onServer.New.EquipmentDescription = equipment.New.EquipmentDescription;
+                            e_onServer.EquipmentDescription = equipment.New.EquipmentDescription;
                             Equipments_tobe_updated_to_Server.Add(e_onServer);
                             //Console.WriteLine(e_onServer.EquipmentDescription + "-----" + equipment.New.EquipmentDescription);
                             changes++;
@@ -132,7 +132,6 @@ namespace asmu
                 catch (Exception e)
                 {
 
-                    // Console.WriteLine(e.Message);
                 }
 
             }
@@ -144,15 +143,13 @@ namespace asmu
         private static void UpdateChangesToServer()
         {
             Console.WriteLine("\nUpdating Changes to Server");
-            foreach (Equipment equipment in Equipments_tobe_updated_to_Server)
+            foreach (ServerEquipment equipment in Equipments_tobe_updated_to_Server)
             {
                 using (HttpClient c = new HttpClient())
                 {
                     string jso = JsonConvert.SerializeObject(equipment).ToString();
                     var content = new StringContent(jso, Encoding.UTF8, "application/json");
-                    Console.Write(jso);
-                    Console.ReadLine();
-                    var resp = c.PutAsync(@"http://xo.rs/api/Equipments" + equipment.EquipmentNumber, content);
+                    var resp = c.PutAsync(@"http://xo.rs/api/Equipments/"+equipment.id, content);
                     Console.WriteLine(resp.Result.StatusCode);
                 }
             }
@@ -165,14 +162,17 @@ namespace asmu
             using (HttpClient client = new HttpClient())
             {
                 string response = await client.GetStringAsync(@"http://xo.rs/api/Equipments/");
-                EquipmentMasterOnServer = JsonConvert.DeserializeObject<List<Equipment>>(response);
+                EquipmentsOnServer = JsonConvert.DeserializeObject<List<ServerEquipment>>(response);
 
             }
 
-            Console.WriteLine(EquipmentMasterOnServer.Count + " Equipments Found on Server");
+            Console.WriteLine(EquipmentsOnServer.Count + " Equipments Found on Server");
 
             CrossCheckDataFromServer();
         }
+
+
+        #region OldCode
 
         private static bool CheckForChanges()
         {
@@ -259,7 +259,7 @@ namespace asmu
                     AssetMaster.Add(e);
                 }
 
-                Console.Write(" Process Completed   ");
+                Console.WriteLine();
             }
         }
 
@@ -955,7 +955,8 @@ namespace asmu
                     if (e.AssetNumber != string.Empty && e.AssetNumber != "Asset") AssetMaster.Add(e);
                 }
             }
-        }
+        } 
+        #endregion
     }
 
 }

@@ -40,6 +40,9 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="RestSharp, Version=106.5.4.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.5.4\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="sapfewse, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\packages\SAP.GUI.Scripting.net.1.0.0\lib\net\sapfewse.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -53,6 +56,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerEquipment.cs" />
     <Compile Include="Equipment.cs" />
     <Compile Include="LoggingSystem.cs" />
     <Compile Include="Program.cs" />
